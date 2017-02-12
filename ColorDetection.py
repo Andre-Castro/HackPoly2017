@@ -21,7 +21,7 @@ ur = 0
 
 sigma = 0.0
 
-orb = cv2.ORB_create(nfeatures=225, edgeThreshold=32, WTA_K=3, patchSize=32)
+orb = cv2.ORB_create(nfeatures=180, edgeThreshold=38, WTA_K=3, patchSize=38)
 
 # create trackbars for color change
 cv2.createTrackbar('loR','cap',0,255,nothing)
@@ -42,10 +42,21 @@ while(cap.isOpened()):
     ret,frame = cap.read()
     frame = cv2.resize(frame, (800, 600))
     
-    lower_pink = np.array([53,53,100], dtype = "uint8")
-    upper_pink = np.array([94,75,255], dtype = "uint8")
+    lower_pink = np.array([37,45,98], dtype = "uint8")
+    upper_pink = np.array([67,66,159], dtype = "uint8")
 
-    frame = cv2.GaussianBlur(frame, (5,5),1.5)
+    frame = cv2.GaussianBlur(frame, (5,5),3)
+
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2Lab)
+
+    framesList = cv2.split(frame)
+
+    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
+    framesList[0] = clahe.apply(framesList[0])
+
+    frame = cv2.merge(framesList)
+
+    frame = cv2.cvtColor(frame, cv2.COLOR_Lab2BGR)
     #cv2.imshow('frameBlur',frame)
 
     mask = cv2.inRange(frame,lower_pink,upper_pink)
