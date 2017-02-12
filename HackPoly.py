@@ -8,18 +8,23 @@ from matplotlib import pyplot as plt
 #cv2.waitKey(0)
 #cv2.destroyAllWindows()
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture('test.mp4')
 
 orb = cv2.ORB_create()
 
 while (cap.isOpened()):
     ret, frame = cap.read()
-
+    frame = cv2.resize(frame, (800,600))
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2BGRA)
 
     kp = orb.detect(frame, None)
 
     kp, des = orb.compute(frame, kp)
+
+    print(type(kp))
+    print(kp)
+    print(type(des))
+    print(des)
 
     frame2 = cv2.drawKeypoints(frame, kp, None, color=(0,255,0), flags=0)
 
