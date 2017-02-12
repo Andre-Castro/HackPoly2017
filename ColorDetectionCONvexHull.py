@@ -2,6 +2,7 @@
 #sys.path.append('/usr/local/lib/python3.5/site-packages')
 import numpy as np
 import cv2
+import turtle
 
 def nothing(x):
     pass
@@ -23,6 +24,28 @@ sigma = 0.0
 
 orb = cv2.ORB_create(nfeatures=225, edgeThreshold=32, WTA_K=3, patchSize=32)
 
+applicableContours = []
+
+initial_list = []
+list_kp = []
+list_kp2 = []
+
+frame2 = None
+gloveDetect = False
+avg_count = 0
+avg_ySum = 0
+avg_xSum = 0
+
+reqx = 800
+
+turtle.title("This is TURTLE!")
+turtle.setup(width=800, height=600, startx=0, starty=0)
+
+turtle.penup()
+turtle.setx(-400 + 10)
+turtle.sety(300 + 10)
+turtle.pendown()
+
 # create trackbars for color change
 cv2.createTrackbar('loR','cap',0,255,nothing)
 cv2.createTrackbar('loG','cap',0,255,nothing)
@@ -39,6 +62,8 @@ switch = '0 : OFF \n1 : ON'
 cv2.createTrackbar(switch, 'cap',0,1,nothing)
 
 while(cap.isOpened()):
+    max_y = 600
+    
     ret,frame = cap.read()
     frame = cv2.resize(frame, (800, 600))
     
@@ -96,12 +121,80 @@ while(cap.isOpened()):
     im2, contours, hierarachy = cv2.findContours(res, cv2.RETR_CCOMP,cv2.CHAIN_APPROX_SIMPLE)
     frame = cv2.drawContours(frame, contours, -1, (255,0,0), 3)
 
+    #print(contours[0][0][0][0])
+    #print(contours[0].shape)
+
+
+
+    if frame is None:
+        continue
+
+    if frame2 is None:
+        for currContour in range(len(contours)):
+            area = cv2.contourArea(contours[currContour])
+            if area > 350:
+                applicableContours.append(currContour)
+                gloveDetect = True
+        if gloveDetect is True:            
+            for specContour in applicableContours:
+                extTop = tuple(contours[specContour][contours[specContour][:, :, 1].argmin()][0])
+                if extTop[1] < max_y:
+                    max_y = extTop[1];
+                    reqx = extTop[0];
+                               
+##                for pointsList in contours[specContour]:
+##                    for point in pointsList:
+##                        if point[1] < max_y:
+##                            max_y = point[1]
+##                            reqx = point[0]
+            #print(max_y)
+            #print(reqx)
+            turtle.penup()
+            turtle.sety((300-max_y))
+            turtle.setx(-(-400+reqx))
+            turtle.pendown()
+
     #hull = []
     #for element in contours:
     #    hull.append(cv2.convexHull(element))
     #frame = cv2.drawContours(frame, hull, -1, (255,255,0), 3)
-    
+
+    if frame2 is not None:
+        gloveDetect = False
+        for currContour in range(len(contours)):
+            area = cv2.contourArea(contours[currContour])
+            if area > 350:
+                applicableContours.append(currContour)
+                gloveDetect = True
+        if gloveDetect is True:
+            for specContour in applicableContours:
+                extTop = tuple(contours[specContour][contours[specContour][:, :, 1].argmin()][0])
+                if extTop[1] < max_y:
+                    max_y = extTop[1]
+                    reqx = extTop[0]
+            if avg_count == 4:
+                avg_count = 0
+                avg_ySum = avg_ySum / 4
+                avg_xSum = avg_xSum / 4
+                
+                
+                turtle.sety((300-avg_ySum))
+                turtle.setx(-(-400+avg_xSum))
+
+            else:
+                avg_count = avg_count + 1
+                avg_ySum = avg_ySum + max_y
+                avg_xSum = avg_xSum + reqx
+
+    frame = cv2.flip(frame, 1)
     cv2.imshow('res', frame)
+
+    if gloveDetect is True:
+        #print("Hello")
+        frame2 = frame
+    else:
+        frame2 = None
+    applicableContours = []
 
 cv2.destroyAllWindows()
 
