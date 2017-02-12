@@ -42,8 +42,8 @@ while(cap.isOpened()):
     ret,frame = cap.read()
     frame = cv2.resize(frame, (800, 600))
     
-    lower_pink = np.array([37,45,98], dtype = "uint8")
-    upper_pink = np.array([67,66,159], dtype = "uint8")
+    lower_pink = np.array([lb,lg,lr], dtype = "uint8")
+    upper_pink = np.array([ub,ug,ur], dtype = "uint8")
 
     frame = cv2.GaussianBlur(frame, (5,5),3)
 

@@ -67,8 +67,8 @@ while(cap.isOpened()):
     ret,frame = cap.read()
     frame = cv2.resize(frame, (800, 600))
     
-    lower_pink = np.array([37,45,98], dtype = "uint8")
-    upper_pink = np.array([67,66,159], dtype = "uint8")
+    lower_pink = np.array([56,35,121], dtype = "uint8")
+    upper_pink = np.array([125,93,145], dtype = "uint8")
 
     frame = cv2.GaussianBlur(frame, (5,5),3)
     #cv2.imshow('frameBlur',frame)
@@ -172,19 +172,33 @@ while(cap.isOpened()):
                 if extTop[1] < max_y:
                     max_y = extTop[1]
                     reqx = extTop[0]
-            if avg_count == 4:
+            if avg_count == 2:
                 avg_count = 0
-                avg_ySum = avg_ySum / 4
-                avg_xSum = avg_xSum / 4
+                avg_ySum = avg_ySum / 2
+                avg_xSum = avg_xSum / 2
                 
                 
                 turtle.sety((300-avg_ySum))
                 turtle.setx(-(-400+avg_xSum))
 
             else:
-                avg_count = avg_count + 1
-                avg_ySum = avg_ySum + max_y
-                avg_xSum = avg_xSum + reqx
+                if avg_count == 0:
+                    avg_count = avg_count + 1
+                    avg_ySum = avg_ySum + max_y
+                    avg_xSum = avg_xSum + reqx
+
+                else:
+                    tempYCount = avg_ySum / avg_count
+                    tempXCount = avg_xSum / avg_count
+
+##                    if abs(max_y - tempYCount) >= 100 or abs(reqx - tempXCount) >= 100:
+##                        avg_count = 0
+##                        avg_ySum = max_y
+##                        avg_xSum = reqx
+##                    else:
+                    avg_count = avg_count + 1
+                    avg_ySum = avg_ySum + max_y
+                    avg_xSum = avg_xSum + reqx
 
     frame = cv2.flip(frame, 1)
     cv2.imshow('res', frame)
