@@ -3,14 +3,20 @@
 import numpy as np
 import cv2
 import turtle
+from tkinter import *
+import time
 
 def nothing(x):
     pass
+
+master = Tk()
 
 cap = cv2.VideoCapture(0)
 #cap = cv2.VideoCapture('Andre2999.mp4')
 cv2.namedWindow('cap')
 cv2.namedWindow('mask')
+
+calibrationPause = 20
 
 lb = 0
 lg = 0
@@ -38,13 +44,22 @@ avg_xSum = 0
 
 reqx = 800
 
-turtle.title("This is TURTLE!")
-turtle.setup(width=800, height=600, startx=0, starty=0)
+canvas_width = 800
+canvas_height = 600
 
-turtle.penup()
-turtle.setx(-400 + 10)
-turtle.sety(300 + 10)
-turtle.pendown()
+w = Canvas(master, width=canvas_width, height=canvas_height)
+w.pack()
+
+currXPos = 0
+currYPos = 0
+
+##turtle.title("This is TURTLE!")
+##turtle.setup(width=800, height=600, startx=0, starty=0)
+##
+##turtle.penup()
+##turtle.setx(-400 + 10)
+##turtle.sety(300 + 10)
+##turtle.pendown()
 
 # create trackbars for color change
 cv2.createTrackbar('loR','cap',0,255,nothing)
@@ -91,7 +106,6 @@ while(cap.isOpened()):
     k = cv2.waitKey(1) & 0xFF
     if k == 27:
         break
-    
 
     # get current positions of four trackbars
     lr = cv2.getTrackbarPos('loR','cap')
@@ -130,6 +144,10 @@ while(cap.isOpened()):
         continue
 
     if frame2 is None:
+        if calibrationPause == 0:
+            pass
+        else:
+            calibrationPause = calibrationPause - 1
         for currContour in range(len(contours)):
             area = cv2.contourArea(contours[currContour])
             if area > 350:
@@ -149,10 +167,12 @@ while(cap.isOpened()):
 ##                            reqx = point[0]
             #print(max_y)
             #print(reqx)
-            turtle.penup()
-            turtle.sety((300-max_y))
-            turtle.setx(-(-400+reqx))
-            turtle.pendown()
+##            turtle.penup()
+##            turtle.sety((300-max_y))
+##            turtle.setx(-(-400+reqx))
+##            turtle.pendown()
+            currXPos = canvas_width - reqx
+            currYPos = max_y
 
     #hull = []
     #for element in contours:
@@ -178,9 +198,12 @@ while(cap.isOpened()):
                 avg_xSum = avg_xSum / 2
                 
                 
-                turtle.sety((300-avg_ySum))
-                turtle.setx(-(-400+avg_xSum))
-
+##                turtle.sety((300-avg_ySum))
+##                turtle.setx(-(-400+avg_xSum))
+                w.create_line(currXPos, currYPos, canvas_width - avg_xSum, avg_ySum, fill="#476042")
+                currXPos = canvas_width - avg_xSum
+                currYPos = avg_ySum
+                
             else:
                 if avg_count == 0:
                     avg_count = avg_count + 1
@@ -209,6 +232,13 @@ while(cap.isOpened()):
     else:
         frame2 = None
     applicableContours = []
+    master.update_idletasks()
+    master.update()
+    time.sleep(0.01)
+
+    k1 = cv2.waitKey(1) & 0xFF
+    if k1 == ord('r'):
+        w.delete("all")
 
 cv2.destroyAllWindows()
 
