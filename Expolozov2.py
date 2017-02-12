@@ -2,8 +2,9 @@ import numpy
 import cv2
 from matplotlib import pyplot as plt
 
-img1 = cv2.imread('one(fou4)-c.png', 0)
-img2 = cv2.imread('one(thr33)-c.png', 0)
+img1 = cv2.imread('one-c.PNG', 0)
+print(type(img1))
+img2 = cv2.imread('test-fist-gesture3.jpg', 0)
 
 orb = cv2.ORB_create()
 
@@ -21,4 +22,15 @@ img3 = cv2.drawMatches(img1, kp1, img2, kp2, matches, None, flags=0)
 #plt.imshow(img2),plt.show()
 img3 = cv2.resize(img3, (800,600))
 cv2.imshow('img3',img3)
-print(type(img3))
+print(type(img1))
+
+print(len(des1))
+print(len(des2))
+print(len(matches))
+
+##print(len(des1))
+##print(len(des2))
+
+##for i in des1:
+##    print(des1[i])
+
