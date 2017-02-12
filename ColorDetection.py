@@ -19,7 +19,9 @@ ub = 0
 ug = 0
 ur = 0
 
-orb = cv2.ORB_create(nfeatures=225, edgeThreshold=34, WTA_K=3, patchSize=34)
+sigma = 0.0
+
+orb = cv2.ORB_create(nfeatures=225, edgeThreshold=32, WTA_K=3, patchSize=32)
 
 # create trackbars for color change
 cv2.createTrackbar('loR','cap',0,255,nothing)
@@ -30,6 +32,8 @@ cv2.createTrackbar('upR','cap',0,255,nothing)
 cv2.createTrackbar('upG','cap',0,255,nothing)
 cv2.createTrackbar('upB','cap',0,255,nothing)
 
+#cv2.createTrackbar('sigma','cap',0.1,5.0,nothing)
+
 # create switch for ON/OFF functionality
 switch = '0 : OFF \n1 : ON'
 cv2.createTrackbar(switch, 'cap',0,1,nothing)
@@ -38,8 +42,11 @@ while(cap.isOpened()):
     ret,frame = cap.read()
     frame = cv2.resize(frame, (800, 600))
     
-    lower_pink = np.array([54.5,54.5,100], dtype = "uint8")
+    lower_pink = np.array([53,53,100], dtype = "uint8")
     upper_pink = np.array([94,75,255], dtype = "uint8")
+
+    frame = cv2.GaussianBlur(frame, (5,5),1.5)
+    #cv2.imshow('frameBlur',frame)
 
     mask = cv2.inRange(frame,lower_pink,upper_pink)
     
@@ -57,6 +64,7 @@ while(cap.isOpened()):
     ur = cv2.getTrackbarPos('upR','cap')
     ug = cv2.getTrackbarPos('upG','cap')
     ub = cv2.getTrackbarPos('upB','cap')
+    sigma = cv2.getTrackbarPos('sigma','cap')
     s = 1
     
     if s == 0:
